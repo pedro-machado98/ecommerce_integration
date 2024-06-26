@@ -7,28 +7,10 @@ import { UpdateEcommerceDto } from './dto/update-ecommerce.dto';
 export class EcommerceController {
   constructor(private readonly ecommerceService: EcommerceService) {}
 
-  @Post()
-  create(@Body() createEcommerceDto: CreateEcommerceDto) {
-    return this.ecommerceService.create(createEcommerceDto);
-  }
-
   @Get()
   findAll() {
-    return this.ecommerceService.findAll();
+    return this.ecommerceService.importarPedidos();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ecommerceService.findOne(+id);
-  }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEcommerceDto: UpdateEcommerceDto) {
-    return this.ecommerceService.update(+id, updateEcommerceDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ecommerceService.remove(+id);
-  }
 }

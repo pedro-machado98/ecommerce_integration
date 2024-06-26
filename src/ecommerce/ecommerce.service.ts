@@ -1,26 +1,36 @@
-import { Injectable } from '@nestjs/common';
-import { CreateEcommerceDto } from './dto/create-ecommerce.dto';
-import { UpdateEcommerceDto } from './dto/update-ecommerce.dto';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { map, catchError, lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class EcommerceService {
-  create(createEcommerceDto: CreateEcommerceDto) {
-    return 'This action adds a new ecommerce';
+
+  private readonly urlCanal: string;
+  
+  constructor(
+    private readonly httpService: HttpService,
+  ) {
+    
+    this.urlCanal = `https://667c6d0f3c30891b865ca0c8.mockapi.io/api/v1/amazon`
   }
 
-  findAll() {
-    return `This action returns all ecommerce`;
+  async importarPedidos() {
+    const request = this.httpService
+    .get(this.urlCanal)
+    .pipe(map((res)=> res.data))
+    .pipe(
+      catchError( () => {
+        throw new ForbiddenException(`API não esta disponivel.`)
+      }),
+    );
+
+    const pedido = await lastValueFrom(request)
+
+    return {
+      data: {
+        pedidos : pedido
+      }
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} ecommerce`;
-  }
-
-  update(id: number, updateEcommerceDto: UpdateEcommerceDto) {
-    return `This action updates a #${id} ecommerce`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} ecommerce`;
-  }
 }
