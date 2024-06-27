@@ -13,18 +13,87 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  name  String?
-  posts Post[]
+model Clientes {
+  id        Int      @default(autoincrement()) @id
+  codigoCliente     Int
+  nomeCliente   String
+  email String
+  endereco    String
+  cep  String
+  uf  String
+  pais  String
+  pedido Pedidos[]
+
+  @@unique([id, codigoCliente])
 }
 
-model Post {
-  id        Int      @default(autoincrement()) @id
-  title     String
-  content   String?
-  published Boolean? @default(false)
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+model Produtos {
+  id Int @default(autoincrement()) @id
+  codigoProduto String
+  nomeProduto String
+  sku BigInt
+  ean BigInt
+  fabricante String
+  qtd_estoque Int @default(5)
+  pedido Pedidos[]
+  compra Compras[]
+  movimentacaoDeEstoque Movimentacao_de_estoque[]
+
+  @@unique([id, codigoProduto])
+}
+
+model Pedidos {
+  id    Int     @default(autoincrement()) @id
+  codigoPedido Int
+  valor Decimal @db.Decimal(10,3)
+  quantidade Int
+  produto Produtos @relation(fields: [idProduto, codigoProduto], references: [id,codigoProduto])
+  idProduto Int
+  codigoProduto String
+  cliente Clientes @relation(fields: [idCliente, codigoCliente], references: [id, codigoCliente])
+  idCliente Int
+  codigoCliente Int
+  endereco String
+  cep String
+  uf String
+  pais String
+  status Status @default(Recebido)
+  canal Canal
+  movimentacaoDeEstoque Movimentacao_de_estoque[]
+
+  @@unique([id, codigoPedido])
+}
+
+model Compras {
+  id Int @default(autoincrement()) @id
+  produto Produtos @relation(fields: [idProduto, codigoProduto], references: [id, codigoProduto])
+  idProduto Int
+  codigoProduto String
+  quantidadeParaCompra Int
+}
+
+model Movimentacao_de_estoque {
+  id Int @default(autoincrement()) @id
+  produto Produtos @relation(fields: [idProduto, codigoProduto], references: [id, codigoProduto])
+  idProduto Int
+  codigoProduto String
+  valor Decimal @db.Decimal(10,3)
+  quantidadeEmEstoque Int
+  pedido Pedidos @relation(fields: [idPedido, codigoPedido], references: [id, codigoPedido])
+  idPedido Int
+  codigoPedido Int
+  quantidadePedido Int
+}
+
+enum Status {
+  Recebido
+  Separado
+  Despachado
+  Entregue
+}
+
+enum Canal {
+  Amazon
+  Magalu
+  Meli
 }
