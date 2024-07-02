@@ -11,10 +11,10 @@ export class ProdutoController {
         return this.produtoService.getAllProdutos()
     }
     
-    @Get(':id')
-    getProduto(@Req() req:any) {
-        return this.produtoService.getProduto(req.body)
-    }
+    // @Get(':id')
+    // getProduto(@Req() req:any) {
+    //     return this.produtoService.getProduto(req.body)
+    // }
     
     @Post('')
     createProdutos(@Req() req:any) {

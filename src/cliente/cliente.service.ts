@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 interface Cliente {
+    id: number;
     codigoCliente:    number
     nomeCliente:   string
     email: string
@@ -20,17 +21,17 @@ export class ClienteService {
         throw new Error('Method not implemented.');
     }
 
-    async getCliente(codigoCliente: number) {
-
+    async getCliente(clientePedido: Cliente) {
+        let cliente: Cliente;
         try {
-            const cliente = await this.prismaService.clientes.findUnique({
+            cliente = await this.prismaService.clientes.findUnique({
                 where: {
-                    codigoCliente: codigoCliente
+                    codigoCliente: clientePedido.codigoCliente
                 }
             })
     
             if(!cliente) {
-                return null
+                await this.createCliente(clientePedido)
             }
 
             return cliente

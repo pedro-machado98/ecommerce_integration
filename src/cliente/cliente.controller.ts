@@ -10,10 +10,10 @@ export class ClienteController {
         return this.clienteService.getAllClientes();
     }
     
-    @Get(':id')
-    getCliente(@Param('id') id:number, @Req() req:any) {
-        return this.clienteService.getCliente(id);
-    }
+    // @Get(':id')
+    // getCliente(@Param('id') id: Cliente, @Req() req:any) {
+    //     return this.clienteService.getCliente(id);
+    // }
     
     @Post('')
     createCliente(@Req() req:any) {

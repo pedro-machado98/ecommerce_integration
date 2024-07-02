@@ -4,24 +4,24 @@ import { ProdutoService } from 'src/produto/produto.service';
 
 import { ClienteService } from './../cliente/cliente.service';
 
-interface Cliente {
-    codigoCliente:    number
-    nomeCliente:   string
-    email: string
-    endereco:    string
-    cep:  string
-    uf:  string
-    pais:  string
-}
+// interface Cliente {
+//     codigoCliente:    number
+//     nomeCliente:   string
+//     email: string
+//     endereco:    string
+//     cep:  string
+//     uf:  string
+//     pais:  string
+// }
 
-interface Produto {
-    codigoProduto: string
-    nomeProduto: string
-    sku: number
-    ean: number
-    fabricante: string
-    qtd_estoque: number
-}
+// interface Produto {
+//     codigoProduto: string
+//     nomeProduto: string
+//     sku: number
+//     ean: number
+//     fabricante: string
+//     qtd_estoque: number
+// }
 
 interface Movimentacao_de_estoque {
 
@@ -31,6 +31,7 @@ type Canal = 'Amazon' | 'Magalu' | 'Meli'
 
 
 interface Pedido {
+    id: number
     idCarga:    number
     codigoPedido: number
     valor: number
@@ -39,8 +40,8 @@ interface Pedido {
     idProduto: number
     codigoProduto: string
     nomeProduto: string
-    sku: number
-    ean: number
+    sku: bigint
+    ean: bigint
     fabricante: string
     idCliente: number
     codigoCliente: number
@@ -94,31 +95,45 @@ export class PedidoService {
         let novoProduto
         try {
 
-            const cliente = await this.clienteService.getCliente(pedido.codigoCliente)
-            const produto = await this.produtoService.getProduto(pedido.codigoProduto)
+            const cliente = await this.clienteService.getCliente(pedido)
+            // const produto = await this.produtoService.getProduto(pedido)
             const pedidoJaImportado = await this.getPedido(pedido.codigoPedido)
 
 
-            if(!cliente) {
-                novoCliente = await this.clienteService.createCliente(pedido)
-            }
-
-            if (!produto) {
-                novoProduto = await this.produtoService.createProduto(pedido)
-            }
+            // if (!produto) {
+            //     novoProduto = await this.produtoService.createProduto(pedido)
+            // }
 
             if(pedidoJaImportado) {
                 return 
             }
-
+            console.log()
             const createdPedido = await this.prismaService.pedidos.create({
                 data: {
                         codigoPedido: pedido.codigoPedido,
                         valor: pedido.valor,
                         quantidade: pedido.quantidade,
-                        idProduto: produto ? produto.id : novoProduto.id,
-                        codigoProduto: pedido.codigoProduto,
-                        idCliente: cliente ? cliente.id : novoCliente.id,
+                        produtos: {
+                            create: [
+                                {
+                                    produto: {
+                                        connectOrCreate: {
+                                            where: {
+                                                codigoProduto: pedido.codigoProduto
+                                            },
+                                            create: {
+                                                codigoProduto: pedido.codigoProduto,
+                                                nomeProduto: pedido.nomeProduto,
+                                                sku: pedido.sku,
+                                                ean: pedido.ean,
+                                                fabricante: pedido.fabricante,
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        idCliente: cliente.id ? cliente.id : novoCliente.id,
                         codigoCliente: pedido.codigoCliente,
                         endereco: pedido.endereco,
                         cep: pedido.cep,
@@ -129,7 +144,7 @@ export class PedidoService {
             })
 
         } catch (err) {
-            throw new Error("Erro ao criar o cliente. " + err);
+            throw new Error("Erro ao criar o pedido. " + err);
         }
     }
     updatePedido() {

@@ -20,7 +20,7 @@ export class Amazon implements canaisInterface {
 
     importarPedidos(pedidos: any) {
 
-        console.log(pedidos);
+        // console.log(pedidos);
 
         pedidos.map((pedido) => {
             this.pedidoService.createPedido(pedido, this.canal)

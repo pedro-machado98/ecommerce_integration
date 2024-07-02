@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,72 +11,77 @@ datasource db {
 }
 
 model Clientes {
-  id        Int      @default(autoincrement()) @id
-  codigoCliente     Int @unique
+  id            Int      @default(autoincrement()) @id
+  codigoCliente Int      @unique
   nomeCliente   String
-  email String
-  endereco    String
-  cep  String
-  uf  String
-  pais  String
-  pedido Pedidos[]
-
+  email         String
+  endereco      String
+  cep           String
+  uf            String
+  pais          String
+  pedidos       Pedidos[]
 }
 
 model Produtos {
-  id Int @default(autoincrement()) @id
-  codigoProduto String @unique
-  nomeProduto String
-  sku BigInt
-  ean BigInt
-  fabricante String
-  qtd_estoque Int @default(5)
-  pedido Pedidos[]
-  compra Compras[]
-  movimentacaoDeEstoque Movimentacao_de_estoque[]
-
+  id                     Int      @default(autoincrement()) @id
+  codigoProduto          String   @unique
+  nomeProduto            String
+  sku                    BigInt
+  ean                    BigInt
+  fabricante             String
+  qtd_estoque            Int      @default(5)
+  pedidos                PedidoProduto[]
+  compras                Compras[]
+  movimentacaoDeEstoque  Movimentacao_de_estoque[]
 }
 
 model Pedidos {
-  id    Int     @default(autoincrement()) @id
-  codigoPedido Int @unique
-  valor Decimal @db.Decimal(10,3)
-  quantidade Int
-  produto Produtos @relation(fields: [idProduto], references: [id])
-  idProduto Int
-  codigoProduto String
-  cliente Clientes @relation(fields: [idCliente], references: [id])
-  idCliente Int
-  codigoCliente Int
-  endereco String
-  cep String
-  uf String
-  pais String
-  status Status @default(Importado)
-  canal Canal
-  movimentacaoDeEstoque Movimentacao_de_estoque[]
+  id                     Int      @default(autoincrement()) @id
+  codigoPedido           Int      @unique
+  valor                  Decimal  @db.Decimal(10,3)
+  quantidade             Int
+  cliente                Clientes @relation(fields: [idCliente], references: [id])
+  idCliente              Int
+  codigoCliente          Int
+  endereco               String
+  cep                    String
+  uf                     String
+  pais                   String
+  status                 Status   @default(Importado)
+  canal                  Canal
+  movimentacaoDeEstoque  Movimentacao_de_estoque[]
+  produtos               PedidoProduto[]
+}
 
+model PedidoProduto {
+  pedidoId  Int
+  produtoId Int
+
+  pedido    Pedidos   @relation(fields: [pedidoId], references: [id])
+  produto   Produtos  @relation(fields: [produtoId], references: [id])
+
+  @@id([pedidoId, produtoId])
 }
 
 model Compras {
-  id Int @default(autoincrement()) @id
-  produto Produtos @relation(fields: [idProduto], references: [id])
-  idProduto Int
-  codigoProduto String
-  quantidadeParaCompra Int
+  id                     Int      @default(autoincrement()) @id
+  produto                Produtos @relation(fields: [idProduto], references: [id])
+  idProduto              Int
+  codigoProduto          String
+  quantidadeParaCompra   Int
 }
 
 model Movimentacao_de_estoque {
-  id Int @default(autoincrement()) @id
-  produto Produtos @relation(fields: [idProduto], references: [id])
-  idProduto Int
-  codigoProduto String
-  valor Decimal @db.Decimal(10,3)
-  quantidadeEmEstoque Int
-  pedido Pedidos @relation(fields: [idPedido], references: [id])
-  idPedido Int
-  codigoPedido Int
-  quantidadePedido Int
+  id                     Int      @default(autoincrement()) @id
+  produto                Produtos @relation(fields: [idProduto], references: [id])
+  idProduto              Int
+  codigoProduto          String
+  valor                  Decimal  @db.Decimal(10,3)
+  quantidadeEmEstoque    Int
+  pedido                 Pedidos  @relation(fields: [idPedido], references: [id])
+  idPedido               Int
+  codigoPedido           Int
+  quantidadePedido       Int
 }
 
 enum Status {

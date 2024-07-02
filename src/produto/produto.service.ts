@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 interface Produto {
+    id: number
     codigoProduto: string
     nomeProduto: string
-    sku: number
-    ean: number
+    sku: bigint
+    ean: bigint
     fabricante: string
 }
 
@@ -17,16 +18,17 @@ export class ProdutoService {
     getAllProdutos() {
         throw new Error('Method not implemented.');
     }
-    async getProduto(codigoProduto: string) {
+    async getProduto(produtoPedido: Produto) {
+        let produto: Produto;
         try {
-            const produto = await this.prismaService.produtos.findUnique({
+            produto = await this.prismaService.produtos.findUnique({
                 where: {
-                    codigoProduto: codigoProduto
+                    codigoProduto: produtoPedido.codigoProduto
                 }
             })
     
             if(!produto) {
-                return null
+                return await this.createProduto(produtoPedido)
             }
 
             return produto

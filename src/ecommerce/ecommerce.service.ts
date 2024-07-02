@@ -21,13 +21,19 @@ export class EcommerceService {
     private produtoService: ProdutoService
     // private amazon: Amazon
   ) {
+    /** REFACT
+     * essa url vai para o dominio ecommerce_amazon
+     */
     this.urlCanal = `https://667c6d0f3c30891b865ca0c8.mockapi.io/api/v1/amazon`
   }
 
   async importarPedidos(canal : string) {
 
     const ecommerce = this.canalFactory.create(canal)
-
+    /** REFACT
+     * Essa requisição vai para o dominio ecommerce_amazon
+     * Para esta função resta apenas orquestrar de quais ecommerces estamos importando.
+     */
     const request = this.httpService
     .get(this.urlCanal)
     .pipe(map((res)=> res.data))
