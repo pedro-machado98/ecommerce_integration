@@ -1,9 +1,9 @@
 version: '3.8'
 services:
-  dev-db:
+  dev-db-ecommerce:
     image: postgres:13
     ports:
-      - 2021:5432
+      - 2022:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123

@@ -31,7 +31,7 @@ export class ClienteService {
             })
     
             if(!cliente) {
-                await this.createCliente(clientePedido)
+                return await this.createCliente(clientePedido)
             }
 
             return cliente
