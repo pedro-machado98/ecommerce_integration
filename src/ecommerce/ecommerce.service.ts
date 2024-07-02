@@ -1,8 +1,10 @@
-import { PrismaService } from './../prisma/prisma.service';
 import { HttpService } from '@nestjs/axios';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { catchError, lastValueFrom, map } from 'rxjs';
+import { ProdutoService } from 'src/produto/produto.service';
 
+import { ClienteService } from './../cliente/cliente.service';
+import { PrismaService } from './../prisma/prisma.service';
 import { Amazon } from './ecommerce_factory/canais';
 import { CanaisFactory } from './ecommerce_factory/canais.factory';
 
@@ -14,7 +16,9 @@ export class EcommerceService {
   constructor(
     private readonly httpService: HttpService,
     private canalFactory: CanaisFactory,
-    private prismaService: PrismaService
+    private prismaService: PrismaService,
+    private ClienteService: ClienteService,
+    private produtoService: ProdutoService
     // private amazon: Amazon
   ) {
     this.urlCanal = `https://667c6d0f3c30891b865ca0c8.mockapi.io/api/v1/amazon`
@@ -33,16 +37,17 @@ export class EcommerceService {
       }),
     );
 
-    
 
-    const pedido = await lastValueFrom(request)
+    const pedidos = await lastValueFrom(request)
 
-    ecommerce.importarPedidos(pedido)
+
+
+    ecommerce.importarPedidos(pedidos)
 
 
     return {
       data: {
-        pedidos : pedido
+        pedidos : pedidos
       }
     }
   }

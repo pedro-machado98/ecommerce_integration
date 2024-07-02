@@ -19,13 +19,32 @@ export class ClienteService {
     getAllClientes() {
         throw new Error('Method not implemented.');
     }
-    getCliente() {
-        throw new Error('Method not implemented.');
-    }
-    createCliente(cliente: Cliente) {
+
+    async getCliente(codigoCliente: number) {
 
         try {
-            const createdCliente = this.prismaService.clientes.create({
+            const cliente = await this.prismaService.clientes.findUnique({
+                where: {
+                    codigoCliente: codigoCliente
+                }
+            })
+    
+            if(!cliente) {
+                return null
+            }
+
+            return cliente
+
+        } catch (err) {
+            throw new Error('Erro ao buscar o cliente na tabela Clientes: ' + err);
+        }
+
+    }
+
+    async createCliente(cliente: Cliente) {
+
+        try {
+            const createdCliente = await this.prismaService.clientes.create({
                 data: {
                     codigoCliente: cliente.codigoCliente,
                     nomeCliente: cliente.nomeCliente,
@@ -37,11 +56,11 @@ export class ClienteService {
                 }
             })
 
+            return createdCliente;
         } catch (err) {
             throw new Error("Erro ao criar o cliente. " + err);
         }
 
-        throw new Error('Method not implemented.');
     }
     updateCliente() {
         throw new Error('Method not implemented.');

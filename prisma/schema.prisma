@@ -15,7 +15,7 @@ datasource db {
 
 model Clientes {
   id        Int      @default(autoincrement()) @id
-  codigoCliente     Int
+  codigoCliente     Int @unique
   nomeCliente   String
   email String
   endereco    String
@@ -24,12 +24,11 @@ model Clientes {
   pais  String
   pedido Pedidos[]
 
-  @@unique([id])
 }
 
 model Produtos {
   id Int @default(autoincrement()) @id
-  codigoProduto String
+  codigoProduto String @unique
   nomeProduto String
   sku BigInt
   ean BigInt
@@ -39,12 +38,11 @@ model Produtos {
   compra Compras[]
   movimentacaoDeEstoque Movimentacao_de_estoque[]
 
-  @@unique([id])
 }
 
 model Pedidos {
   id    Int     @default(autoincrement()) @id
-  codigoPedido Int
+  codigoPedido Int @unique
   valor Decimal @db.Decimal(10,3)
   quantidade Int
   produto Produtos @relation(fields: [idProduto], references: [id])
@@ -57,11 +55,10 @@ model Pedidos {
   cep String
   uf String
   pais String
-  status Status @default(Recebido)
+  status Status @default(Importado)
   canal Canal
   movimentacaoDeEstoque Movimentacao_de_estoque[]
 
-  @@unique([id])
 }
 
 model Compras {
@@ -86,7 +83,7 @@ model Movimentacao_de_estoque {
 }
 
 enum Status {
-  Recebido
+  Importado
   Separado
   Despachado
   Entregue

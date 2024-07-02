@@ -1,4 +1,5 @@
 import { Controller, Delete, Get, Post, Put, Req } from '@nestjs/common';
+
 import { ProdutoService } from './produto.service';
 
 @Controller('produto')
@@ -12,7 +13,7 @@ export class ProdutoController {
     
     @Get(':id')
     getProduto(@Req() req:any) {
-        return this.produtoService.getProduto()
+        return this.produtoService.getProduto(req.body)
     }
     
     @Post('')

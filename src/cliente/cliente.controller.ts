@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post, Put, Req } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { ClienteService } from './cliente.service';
 
 @Controller('cliente')
@@ -11,8 +11,8 @@ export class ClienteController {
     }
     
     @Get(':id')
-    getCliente(@Req() req:any) {
-        return this.clienteService.getCliente();
+    getCliente(@Param('id') id:number, @Req() req:any) {
+        return this.clienteService.getCliente(id);
     }
     
     @Post('')

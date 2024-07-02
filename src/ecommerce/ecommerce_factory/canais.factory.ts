@@ -8,12 +8,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class CanaisFactory {
 
-    // constructor(private pedidoService: PedidoService) {}
+    constructor(private pedidoService: PedidoService) {}
 
     create(canal) {
         switch (canal) {
             case canais.amz.name:
-                return new Amazon()
+                return new Amazon(this.pedidoService)
             case canais.meli.name:
                 return new Meli()
             case canais.mgl.name:

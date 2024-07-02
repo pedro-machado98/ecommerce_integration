@@ -1,4 +1,5 @@
 import { Controller, Delete, Get, Post, Put, Req } from '@nestjs/common';
+
 import { PedidoService } from './pedido.service';
 
 @Controller('pedido')
@@ -12,12 +13,12 @@ export class PedidoController {
     
     @Get(':id')
     getPedido(@Req() req:any) {
-        return this.pedidoService.getPedido();
+        return this.pedidoService.getPedido(req.body);
     }
     
     @Post('')
     createPedido(@Req() req:any) {
-        return this.pedidoService.createPedido(req.body);
+        return this.pedidoService.createPedido(req.body, req.body.canal);
     }
     
     @Put(':id')

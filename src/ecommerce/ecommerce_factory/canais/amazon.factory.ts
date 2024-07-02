@@ -1,22 +1,31 @@
 import { Injectable } from '@nestjs/common';
+import { map } from 'rxjs';
+import { canais } from 'src/ecommerce/common/canais';
+import { PedidoService } from 'src/pedido/pedido.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 import { canaisInterface } from './interface/canais.interface';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PedidoService } from 'src/pedido/pedido.service';
+import { Canal } from './types/canal.types';
 
 @Injectable()
 export class Amazon implements canaisInterface {
 
-    // constructor(private pedido: PedidoService ) {}
+    private canal: Canal;
+
+    constructor(private pedidoService: PedidoService ) {
+
+        this.canal = 'Amazon';
+    }
 
 
-    importarPedidos(pedido: any) {
+    importarPedidos(pedidos: any) {
 
-        console.log(pedido);
+        console.log(pedidos);
 
+        pedidos.map((pedido) => {
+            this.pedidoService.createPedido(pedido, this.canal)
+        })
         
-
-        throw new Error('Method not implemented.');
     }
 
 

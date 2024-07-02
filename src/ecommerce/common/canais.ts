@@ -2,14 +2,15 @@
  * Mapear os tipos de canais que integrados
  */
 
-export const canais={
+
+export const canais = {
     amz:{
-        name:'amazon',
+        name:'Amazon',
     },
     meli:{
-        name:'meli',
+        name:'Meli',
     },
     mgl:{
-        name:'magalu',
+        name:'Magalu',
     },
 }

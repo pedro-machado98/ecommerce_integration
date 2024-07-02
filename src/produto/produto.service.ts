@@ -7,7 +7,6 @@ interface Produto {
     sku: number
     ean: number
     fabricante: string
-    qtd_estoque: number
 }
 
 @Injectable()
@@ -18,22 +17,40 @@ export class ProdutoService {
     getAllProdutos() {
         throw new Error('Method not implemented.');
     }
-    getProduto() {
+    async getProduto(codigoProduto: string) {
+        try {
+            const produto = await this.prismaService.produtos.findUnique({
+                where: {
+                    codigoProduto: codigoProduto
+                }
+            })
+    
+            if(!produto) {
+                return null
+            }
+
+            return produto
+
+        } catch (err) {
+            throw new Error('Erro ao criar o produto na tabela Produtos: ' + err);
+        }
+
         throw new Error('Method not implemented.');
     }
     createProduto(produto: Produto) {
 
         try {
-            const createdCliente = this.prismaService.produtos.create({
+            const createdProduto = this.prismaService.produtos.create({
                 data: {
                     codigoProduto: produto.codigoProduto,
                     nomeProduto: produto.nomeProduto,
                     sku: produto.sku,
                     ean: produto.ean,
                     fabricante: produto.fabricante,
-                    qtd_estoque: produto.qtd_estoque
                 }
             })
+
+            return createdProduto
 
         } catch (err) {
             throw new Error("Erro ao criar o produto. " + err);

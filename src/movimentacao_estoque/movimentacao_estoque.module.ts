@@ -6,6 +6,6 @@ import { MovimentacaoEstoqueService } from './movimentacao_estoque.service';
 
 @Module({
   controllers: [MovimentacaoEstoqueController],
-  providers: [MovimentacaoEstoqueService, CanaisFactory]
+  providers: [MovimentacaoEstoqueService]
 })
 export class MovimentacaoEstoqueModule {}

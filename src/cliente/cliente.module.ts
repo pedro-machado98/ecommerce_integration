@@ -4,6 +4,7 @@ import { ClienteService } from './cliente.service';
 
 @Module({
   controllers: [ClienteController],
-  providers: [ClienteService]
+  providers: [ClienteService],
+  exports: [ClienteService]
 })
 export class ClienteModule {}
