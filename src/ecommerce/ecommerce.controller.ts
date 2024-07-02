@@ -1,14 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
-import { EcommerceService } from './ecommerce.service';
+import { Controller, Get, Param } from '@nestjs/common';
 
+import { EcommerceService } from './ecommerce.service';
 
 @Controller('ecommerce')
 export class EcommerceController {
   constructor(private readonly ecommerceService: EcommerceService) {}
 
-  @Get()
-  importarPedidos() {
-    return this.ecommerceService.importarPedidos();
+  @Get(':canal')
+  importarPedidos(@Param('canal') canal : string ) {
+    return this.ecommerceService.importarPedidos(canal);
   }
 
 

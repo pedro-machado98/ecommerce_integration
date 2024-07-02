@@ -24,7 +24,7 @@ model Clientes {
   pais  String
   pedido Pedidos[]
 
-  @@unique([id, codigoCliente])
+  @@unique([id])
 }
 
 model Produtos {
@@ -39,7 +39,7 @@ model Produtos {
   compra Compras[]
   movimentacaoDeEstoque Movimentacao_de_estoque[]
 
-  @@unique([id, codigoProduto])
+  @@unique([id])
 }
 
 model Pedidos {
@@ -47,10 +47,10 @@ model Pedidos {
   codigoPedido Int
   valor Decimal @db.Decimal(10,3)
   quantidade Int
-  produto Produtos @relation(fields: [idProduto, codigoProduto], references: [id,codigoProduto])
+  produto Produtos @relation(fields: [idProduto], references: [id])
   idProduto Int
   codigoProduto String
-  cliente Clientes @relation(fields: [idCliente, codigoCliente], references: [id, codigoCliente])
+  cliente Clientes @relation(fields: [idCliente], references: [id])
   idCliente Int
   codigoCliente Int
   endereco String
@@ -61,12 +61,12 @@ model Pedidos {
   canal Canal
   movimentacaoDeEstoque Movimentacao_de_estoque[]
 
-  @@unique([id, codigoPedido])
+  @@unique([id])
 }
 
 model Compras {
   id Int @default(autoincrement()) @id
-  produto Produtos @relation(fields: [idProduto, codigoProduto], references: [id, codigoProduto])
+  produto Produtos @relation(fields: [idProduto], references: [id])
   idProduto Int
   codigoProduto String
   quantidadeParaCompra Int
@@ -74,12 +74,12 @@ model Compras {
 
 model Movimentacao_de_estoque {
   id Int @default(autoincrement()) @id
-  produto Produtos @relation(fields: [idProduto, codigoProduto], references: [id, codigoProduto])
+  produto Produtos @relation(fields: [idProduto], references: [id])
   idProduto Int
   codigoProduto String
   valor Decimal @db.Decimal(10,3)
   quantidadeEmEstoque Int
-  pedido Pedidos @relation(fields: [idPedido, codigoPedido], references: [id, codigoPedido])
+  pedido Pedidos @relation(fields: [idPedido], references: [id])
   idPedido Int
   codigoPedido Int
   quantidadePedido Int

@@ -17,7 +17,7 @@ export class ClienteController {
     
     @Post('')
     createCliente(@Req() req:any) {
-        return this.clienteService.createCliente();
+        return this.clienteService.createCliente(req.body);
     }
     
     @Put(':id')

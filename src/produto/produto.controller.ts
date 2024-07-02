@@ -17,7 +17,7 @@ export class ProdutoController {
     
     @Post('')
     createProdutos(@Req() req:any) {
-        return this.produtoService.createProduto()
+        return this.produtoService.createProduto(req.body)
     }
     
     @Put(':id')

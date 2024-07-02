@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ProdutoModule } from './produto/produto.module';
 import { ClienteModule } from './cliente/cliente.module';
-import { EstoqueModule } from './estoque/estoque.module';
-import { PedidoModule } from './pedido/pedido.module';
 import { CompraModule } from './compra/compra.module';
-import { MovimentacaoEstoqueModule } from './movimentacao_estoque/movimentacao_estoque.module';
-import { ConfigModule } from '@nestjs/config';
 import { EcommerceModule } from './ecommerce/ecommerce.module';
+import { EstoqueModule } from './estoque/estoque.module';
+import { MovimentacaoEstoqueModule } from './movimentacao_estoque/movimentacao_estoque.module';
+import { PedidoModule } from './pedido/pedido.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { ProdutoModule } from './produto/produto.module';
 
 @Module({
   imports: [ProdutoModule,
@@ -17,8 +19,11 @@ import { EcommerceModule } from './ecommerce/ecommerce.module';
     PedidoModule, 
     CompraModule, 
     MovimentacaoEstoqueModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal:true
+    }),
     EcommerceModule,
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -17,7 +17,7 @@ export class PedidoController {
     
     @Post('')
     createPedido(@Req() req:any) {
-        return this.pedidoService.createPedido();
+        return this.pedidoService.createPedido(req.body);
     }
     
     @Put(':id')
