@@ -46,11 +46,8 @@ export class EcommerceService {
 
     const pedidos = await lastValueFrom(request)
 
-
-
     ecommerce.importarPedidos(pedidos)
-
-
+    
     return {
       data: {
         pedidos : pedidos

@@ -144,7 +144,7 @@ export class PedidoService {
             })
 
         } catch (err) {
-            throw new Error("Erro ao criar o pedido. " + err);
+            throw new Error("\nErro ao criar o pedido. " + err);
         }
     }
     updatePedido() {

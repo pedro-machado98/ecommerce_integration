@@ -1,4 +1,4 @@
 export interface canaisInterface {
 
-    importarPedidos(pedido : any)
+    importarPedidos(pedido: any)
 }

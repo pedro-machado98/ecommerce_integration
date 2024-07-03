@@ -13,7 +13,6 @@ export class Amazon implements canaisInterface {
     private canal: Canal;
 
     constructor(private pedidoService: PedidoService ) {
-
         this.canal = 'Amazon';
     }
 
@@ -25,8 +24,5 @@ export class Amazon implements canaisInterface {
         pedidos.map((pedido) => {
             this.pedidoService.createPedido(pedido, this.canal)
         })
-        
     }
-
-
 }

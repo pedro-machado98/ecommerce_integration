@@ -37,7 +37,7 @@ export class ClienteService {
             return cliente
 
         } catch (err) {
-            throw new Error('Erro ao buscar o cliente na tabela Clientes: ' + err);
+            throw new Error('\nErro ao buscar o cliente na tabela Clientes: ' + err);
         }
 
     }
@@ -59,7 +59,7 @@ export class ClienteService {
 
             return createdCliente;
         } catch (err) {
-            throw new Error("Erro ao criar o cliente. " + err);
+            throw new Error("\nErro ao criar o cliente. " + err);
         }
 
     }
