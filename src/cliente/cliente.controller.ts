@@ -1,4 +1,5 @@
 import { Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
+
 import { ClienteService } from './cliente.service';
 
 @Controller('cliente')
@@ -15,10 +16,10 @@ export class ClienteController {
     //     return this.clienteService.getCliente(id);
     // }
     
-    @Post('')
-    createCliente(@Req() req:any) {
-        return this.clienteService.createCliente(req.body);
-    }
+    // @Post('')
+    // createCliente(@Req() req:any) {
+    //     return this.clienteService.createCliente(req.body);
+    // }
     
     @Put(':id')
     updateCliente(@Req() req:any) {

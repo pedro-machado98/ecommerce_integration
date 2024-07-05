@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 interface Cliente {
@@ -31,7 +32,7 @@ export class ClienteService {
             })
     
             if(!cliente) {
-                return await this.createCliente(clientePedido)
+                return null
             }
 
             return cliente
@@ -42,24 +43,37 @@ export class ClienteService {
 
     }
 
-    async createCliente(cliente: Cliente) {
-
+    async createCliente(clientePedido: Cliente) {
+        // let cliente
         try {
-            const createdCliente = await this.prismaService.clientes.create({
-                data: {
-                    codigoCliente: cliente.codigoCliente,
-                    nomeCliente: cliente.nomeCliente,
-                    email: cliente.email,
-                    endereco: cliente.endereco,
-                    cep: cliente.cep,
-                    uf: cliente.uf,
-                    pais: cliente.pais,
-                }
-            })
 
-            return createdCliente;
-        } catch (err) {
-            throw new Error("\nErro ao criar o cliente. " + err);
+            const cliente = await this.getCliente(clientePedido)
+    
+            if(!cliente) {
+                return await this.prismaService.clientes.create({
+                    data: {
+                        codigoCliente: clientePedido.codigoCliente,
+                        nomeCliente: clientePedido.nomeCliente,
+                        email: clientePedido.email,
+                        endereco: clientePedido.endereco,
+                        cep: clientePedido.cep,
+                        uf: clientePedido.uf,
+                        pais: clientePedido.pais,
+                    }
+                })
+            } else {
+                return cliente
+            }
+
+        } catch (e) {
+            if(e instanceof Prisma.PrismaClientKnownRequestError) {
+                if(e.code === 'P2002') {
+                    console.log(
+                        'Já existe esse cliente no banco de dados.'
+                    )
+                }
+            }
+            throw (e.message)
         }
 
     }

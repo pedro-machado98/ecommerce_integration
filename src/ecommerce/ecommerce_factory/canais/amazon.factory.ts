@@ -17,12 +17,16 @@ export class Amazon implements canaisInterface {
     }
 
 
-    importarPedidos(pedidos: any) {
+    async importarPedidos(pedidos: any) {
 
         // console.log(pedidos);
 
-        pedidos.map((pedido) => {
-            this.pedidoService.createPedido(pedido, this.canal)
-        })
+        for (let i=0 ; i < pedidos.length ; i++) {
+            await this.pedidoService.createPedido(pedidos[i], this.canal)
+        }
+
+        // pedidos.map((pedido) => {
+        //     this.pedidoService.createPedido(pedido, this.canal)
+        // })
     }
 }

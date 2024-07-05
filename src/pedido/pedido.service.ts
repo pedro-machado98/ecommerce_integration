@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProdutoService } from 'src/produto/produto.service';
 
@@ -90,63 +91,69 @@ export class PedidoService {
 
         throw new Error('Method not implemented.');
     }
+
     async createPedido(pedido: Pedido, canal: Canal ) {
-        let novoCliente
-        let novoProduto
+
         try {
 
-            const cliente = await this.clienteService.getCliente(pedido)
+            const cliente = await this.clienteService.createCliente(pedido)
             // const produto = await this.produtoService.getProduto(pedido)
             const pedidoJaImportado = await this.getPedido(pedido.codigoPedido)
-
 
             // if (!produto) {
             //     novoProduto = await this.produtoService.createProduto(pedido)
             // }
 
-            if(pedidoJaImportado) {
-                return 
-            }
-            console.log()
-            const createdPedido = await this.prismaService.pedidos.create({
-                data: {
-                        codigoPedido: pedido.codigoPedido,
-                        valor: pedido.valor,
-                        quantidade: pedido.quantidade,
-                        produtos: {
-                            create: [
-                                {
-                                    produto: {
-                                        connectOrCreate: {
-                                            where: {
-                                                codigoProduto: pedido.codigoProduto
-                                            },
-                                            create: {
-                                                codigoProduto: pedido.codigoProduto,
-                                                nomeProduto: pedido.nomeProduto,
-                                                sku: pedido.sku,
-                                                ean: pedido.ean,
-                                                fabricante: pedido.fabricante,
+
+            if(!pedidoJaImportado) {
+                const createdPedido = await this.prismaService.pedidos.create({
+                    data: {
+                            codigoPedido: pedido.codigoPedido,
+                            valor: pedido.valor,
+                            quantidade: pedido.quantidade,
+                            produtos: {
+                                create: [
+                                    {
+                                        produto: {
+                                            connectOrCreate: {
+                                                where: {
+                                                    codigoProduto: pedido.codigoProduto
+                                                },
+                                                create: {
+                                                    codigoProduto: pedido.codigoProduto,
+                                                    nomeProduto: pedido.nomeProduto,
+                                                    sku: pedido.sku,
+                                                    ean: pedido.ean,
+                                                    fabricante: pedido.fabricante,
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            ]
-                        },
-                        idCliente: cliente.id ? cliente.id : novoCliente.id,
-                        codigoCliente: pedido.codigoCliente,
-                        endereco: pedido.endereco,
-                        cep: pedido.cep,
-                        uf: pedido.uf,
-                        pais: pedido.pais,
-                        canal: canal,
-                }
-            })
+                                ]
+                            },
+                            idCliente: cliente.id,
+                            codigoCliente: pedido.codigoCliente,
+                            endereco: pedido.endereco,
+                            cep: pedido.cep,
+                            uf: pedido.uf,
+                            pais: pedido.pais,
+                            canal: canal,
+                    }
+                })
+            }
 
-        } catch (err) {
-            throw new Error("\nErro ao criar o pedido. " + err);
+        } catch (e) {
+            if(e instanceof Prisma.PrismaClientKnownRequestError) {
+                if(e.code === 'P2002') {
+                    console.log(
+                        'Violação da constrain de codigoPedido. Tentou registrar pedido já cadastrado no banco'
+                    )
+                }
+            }
+            throw (e.message);
         }
     }
+    
     updatePedido() {
         throw new Error('Method not implemented.');
     }
