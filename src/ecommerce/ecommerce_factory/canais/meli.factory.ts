@@ -4,7 +4,7 @@ import { canaisInterface } from './interface/canais.interface';
 
 @Injectable()
 export class Meli implements canaisInterface {
-    importarPedidos(pedido: any) {
+    importarPedidos() {
         throw new Error('Method not implemented.');
     }
 

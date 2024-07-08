@@ -16,41 +16,17 @@ export class EcommerceService {
   constructor(
     private readonly httpService: HttpService,
     private canalFactory: CanaisFactory,
-    private prismaService: PrismaService,
-    private ClienteService: ClienteService,
-    private produtoService: ProdutoService
-    // private amazon: Amazon
-  ) {
-    /** REFACT
-     * essa url vai para o dominio ecommerce_amazon
-     */
-    this.urlCanal = `https://667c6d0f3c30891b865ca0c8.mockapi.io/api/v1/amazon`
-  }
+  ) {}
 
   async importarPedidos(canal : string) {
 
     const ecommerce = this.canalFactory.create(canal)
-    /** REFACT
-     * Essa requisição vai para o dominio ecommerce_amazon
-     * Para esta função resta apenas orquestrar de quais ecommerces estamos importando.
-     */
-    const request = this.httpService
-    .get(this.urlCanal)
-    .pipe(map((res)=> res.data))
-    .pipe(
-      catchError( () => {
-        throw new ForbiddenException(`API não esta disponivel.`)
-      }),
-    );
 
-
-    const pedidos = await lastValueFrom(request)
-
-    ecommerce.importarPedidos(pedidos)
+    const pedidos = await ecommerce.importarPedidos()
     
     return {
       data: {
-        pedidos : pedidos
+        pedidos
       }
     }
   }

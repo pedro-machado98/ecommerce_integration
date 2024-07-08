@@ -53,9 +53,6 @@ interface Pedido {
     cep: string
     uf: string
     pais: string
-    // status: string
-    // canal: 'Amazon' | 'Meli' | 'Magalu'
-    // movimentacao_de_estoque: Movimentacao_de_estoque
 }
 
 @Injectable()
@@ -99,13 +96,7 @@ export class PedidoService {
         try {
 
             const cliente = await this.clienteService.createCliente(pedido)
-            // const produto = await this.produtoService.getProduto(pedido)
             const pedidoJaImportado = await this.getPedido(pedido.codigoPedido)
-
-            // if (!produto) {
-            //     novoProduto = await this.produtoService.createProduto(pedido)
-            // }
-
 
             if(!pedidoJaImportado) {
                 const createdPedido = await this.prismaService.pedidos.create({
@@ -200,7 +191,6 @@ export class PedidoService {
 
             if(pedido.length == 1) {
                 pedido.map(async (pedido) => {
-                    // console.log("Cliente fez apenas um pedido " + pedido.codigoPedido)
 
                     await this.criaMovimentacao(pedido)
     
@@ -210,8 +200,6 @@ export class PedidoService {
             } else {
                 let cont = 0;
                 let qtdProdutosDoPedido = pedido.length;
-                // let produtosMesmoPedido;
-
 
                 for (let i = 0; i < qtdProdutosDoPedido; i++) {
                     const pedidoAtual = pedido[i];
@@ -293,9 +281,7 @@ export class PedidoService {
 
             
         })
-        
-        return pedidosPorCliente.filter((pedido) => pedido.status == 'Importado').map((pedido)=> pedido.status = 'Separado')
-        // throw new Error('Method not implemented.');
+        return pedidosPorCliente
     }
 
     async criaMovimentacao(pedido) {
