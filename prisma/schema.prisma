@@ -39,6 +39,7 @@ model Pedidos {
   id                     Int      @default(autoincrement()) @id
   codigoPedido           Int      @unique
   valor                  Decimal  @db.Decimal(10,3)
+  valorTotal             Decimal  @db.Decimal(10,3)
   quantidade             Int
   cliente                Clientes @relation(fields: [idCliente], references: [id])
   idCliente              Int

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { map, throwError } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProdutoService } from 'src/produto/produto.service';
 
@@ -36,6 +37,7 @@ interface Pedido {
     idCarga:    number
     codigoPedido: number
     valor: number
+    valorTotal: number
     quantidade: number
     email: string
     idProduto: number
@@ -110,6 +112,7 @@ export class PedidoService {
                     data: {
                             codigoPedido: pedido.codigoPedido,
                             valor: pedido.valor,
+                            valorTotal: pedido.valorTotal,
                             quantidade: pedido.quantidade,
                             produtos: {
                                 create: [
@@ -160,4 +163,204 @@ export class PedidoService {
     deletePedido() {
         throw new Error('Method not implemented.');
     }
+
+    async processarTodosOsPedidos() {
+
+        const pedidos = await this.prismaService.pedidos.findMany({
+            
+            where: {
+                status: "Importado"
+            },
+            orderBy: {
+                valorTotal: 'desc'
+            },
+            include: {
+                produtos: true
+            },
+        });
+
+        let pedidosPorCliente = pedidos.reduce((acc, pedido) => {
+            if(!acc[pedido.codigoCliente]) {
+                acc[pedido.codigoCliente] = []
+            }
+
+            acc[pedido.codigoCliente].push(pedido);
+            return acc;
+        }, [])
+
+        pedidosPorCliente = pedidosPorCliente.filter(array => array.length > 0);
+
+        pedidosPorCliente = pedidosPorCliente.sort((a, b) => {
+            let valorA = a[0].valorTotal;
+            let valorB = b[0].valorTotal;
+            return valorB - valorA;
+          });
+
+        pedidosPorCliente.map(async (pedido) => {
+
+            if(pedido.length == 1) {
+                pedido.map(async (pedido) => {
+                    // console.log("Cliente fez apenas um pedido " + pedido.codigoPedido)
+
+                    await this.criaMovimentacao(pedido)
+    
+                })
+                
+                
+            } else {
+                let cont = 0;
+                let qtdProdutosDoPedido = pedido.length;
+                // let produtosMesmoPedido;
+
+
+                for (let i = 0; i < qtdProdutosDoPedido; i++) {
+                    const pedidoAtual = pedido[i];
+
+                    const produto = await this.prismaService.produtos.findUnique({
+                        where: {
+                            id: pedidoAtual.produtos[0].produtoId
+                        }
+                    });
+
+                    if (produto.codigoProduto === 'PROD001') debugger;
+                    if (produto.qtd_estoque < pedidoAtual.quantidade) {
+                        console.log("Não é possível completar o pedido pois o produto " + produto.nomeProduto + " está em falta");
+
+                        const compras = await this.prismaService.compras.create({
+                            data: {
+                                idProduto: produto.id,
+                                codigoProduto: produto.codigoProduto,
+                                quantidadeParaCompra: ((produto.qtd_estoque - pedidoAtual.quantidade) * -1)
+                            }
+                        });
+
+                        if (compras) {
+                            console.log(`Pendência de compra do produto ${produto.nomeProduto} criada`);
+                        }
+                    } else {
+                        cont++;
+                    }
+                }
+
+                if (cont === qtdProdutosDoPedido) {
+                    for (let i = 0; i < qtdProdutosDoPedido; i++) {
+                        const pedidoAtual = pedido[i];
+
+                        const produto = await this.prismaService.produtos.findUnique({
+                            where: {
+                                id: pedidoAtual.produtos[0].produtoId
+                            }
+                        });
+
+                        const movimentacao = await this.prismaService.movimentacao_de_estoque.create({
+                            data: {
+                                idProduto: produto.id,
+                                codigoProduto: produto.codigoProduto,
+                                valor: pedidoAtual.valor,
+                                quantidadeEmEstoque: produto.qtd_estoque,
+                                idPedido: pedidoAtual.id,
+                                codigoPedido: pedidoAtual.codigoPedido,
+                                quantidadePedido: pedidoAtual.quantidade,
+                            }
+                        });
+
+                        const novoEstoque = await this.prismaService.produtos.update({
+                            where: {
+                                id: produto.id
+                            },
+                            data: {
+                                qtd_estoque: produto.qtd_estoque - pedidoAtual.quantidade
+                            }
+                        });
+
+                        const separacao = await this.prismaService.pedidos.update({
+                            where: {
+                                id: pedidoAtual.id
+                            },
+                            data: {
+                                status: 'Separado'
+                            }
+                        });
+
+                        if (novoEstoque && separacao) {
+                            console.log(`Processamento do pedido ${pedidoAtual.codigoPedido} completo`);
+                        }
+                    }
+                }
+
+
+            }
+
+            
+        })
+        
+        return pedidosPorCliente.filter((pedido) => pedido.status == 'Importado').map((pedido)=> pedido.status = 'Separado')
+        // throw new Error('Method not implemented.');
+    }
+
+    async criaMovimentacao(pedido) {
+    
+        const produto = await this.prismaService.produtos.findUnique({
+            where: {
+                id: pedido.produtos[0].produtoId
+            }
+        })
+
+        if(produto.qtd_estoque >= pedido.quantidade) {
+            const movimentacao = await this.prismaService.movimentacao_de_estoque.create({
+                data: {
+                    idProduto: produto.id,
+                    codigoProduto: produto.codigoProduto,
+                    valor: pedido.valor,
+                    quantidadeEmEstoque: produto.qtd_estoque,
+                    idPedido: pedido.id,
+                    codigoPedido: pedido.codigoPedido,
+                    quantidadePedido: pedido.quantidade,
+                }
+            })
+
+            if(!movimentacao) {
+                console.log("Estoque movimentado")
+            }
+
+            const novoEstoque = await this.prismaService.produtos.update({
+                where: {
+                    id: produto.id
+                },
+                data: {
+                    qtd_estoque: produto.qtd_estoque - pedido.quantidade
+                }
+            });
+
+            const separacao = await this.prismaService.pedidos.update({
+                where: {
+                    id: pedido.id
+                },
+                data: {
+                    status: 'Separado'
+                }
+            })
+
+            if(novoEstoque && separacao) {
+                console.log(`Processamento do pedido ${pedido.codigoPedido} completo`)
+            }
+
+
+        } else {
+            console.log(`A quantidade em estoque do produto ${produto.nomeProduto} não é o suficiente para atender ao pedido ${pedido.codigoPedido}`)
+            const compras = await this.prismaService.compras.create({
+                data: {
+                    idProduto: produto.id,
+                    codigoProduto: produto.codigoProduto,
+                    quantidadeParaCompra: ((produto.qtd_estoque - pedido.quantidade) * -1)
+                }
+            })
+
+            if(compras) {
+                console.log(`Pendencia de compra do produto ${produto.nomeProduto} criada`)
+            }
+        }
+
+    }
 }
+
